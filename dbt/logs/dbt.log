@@ -1,0 +1,46 @@
+[0m16:35:29.689158 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7717d739fdd0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7717d547be10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7717d54820d0>]}
+
+
+============================== 16:35:29.694227 | 262633db-2d84-4a90-8da3-34ca41df887a ==============================
+[0m16:35:29.694227 [info ] [MainThread]: Running with dbt=1.8.8
+[0m16:35:29.694819 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'fail_fast': 'False', 'profiles_dir': '/home/btharsana/.dbt', 'log_path': 'logs', 'version_check': 'True', 'debug': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'static_parser': 'True', 'log_format': 'default', 'invocation_command': 'dbt init jaffle_shop', 'target_path': 'None', 'introspect': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m16:35:29.703750 [debug] [MainThread]: Starter project path: /home/btharsana/.local/lib/python3.11/site-packages/dbt/include/starter_project
+[0m16:35:29.713680 [info ] [MainThread]: 
+Your new dbt project "jaffle_shop" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m16:35:29.714733 [info ] [MainThread]: Setting up your profile.
+[0m16:38:08.256262 [info ] [MainThread]: Profile jaffle_shop written to /home/btharsana/.dbt/profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
+[0m16:38:08.260667 [debug] [MainThread]: Resource report: {"command_name": "init", "command_success": true, "command_wall_clock_time": 158.63197, "process_user_time": 1.591192, "process_kernel_time": 0.164112, "process_mem_max_rss": "109760", "process_in_blocks": "368", "process_out_blocks": "80"}
+[0m16:38:08.262470 [debug] [MainThread]: Command `dbt init` succeeded at 16:38:08.262140 after 158.63 seconds
+[0m16:38:08.263385 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7717d56248d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7717d875e410>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7717d85c1510>]}
+[0m16:38:08.264029 [debug] [MainThread]: Flushing usage events
+[0m16:38:29.218695 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7bdfcc0230d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7bdfcbe7ad50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7bdfcbe7bfd0>]}
+
+
+============================== 16:38:29.224236 | fb9d1dc6-ce89-4a7a-b483-df77677eb8f2 ==============================
+[0m16:38:29.224236 [info ] [MainThread]: Running with dbt=1.8.8
+[0m16:38:29.225386 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'debug': 'False', 'version_check': 'True', 'log_path': 'logs', 'fail_fast': 'False', 'profiles_dir': '/home/btharsana/.dbt', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'static_parser': 'True', 'log_format': 'default', 'invocation_command': 'dbt debug', 'target_path': 'None', 'introspect': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m16:38:29.246168 [info ] [MainThread]: dbt version: 1.8.8
+[0m16:38:29.247034 [info ] [MainThread]: python version: 3.11.11
+[0m16:38:29.247587 [info ] [MainThread]: python path: /usr/bin/python3.11
+[0m16:38:29.247990 [info ] [MainThread]: os info: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35
+[0m16:38:29.493735 [error] [MainThread]: Encountered an error:
+Parsing Error
+  Env var required but not provided: 'MSSQL_DBT_DATABASE'
+[0m16:38:29.495369 [debug] [MainThread]: Resource report: {"command_name": "debug", "command_wall_clock_time": 0.3669526, "process_user_time": 2.055025, "process_kernel_time": 0.256377, "process_mem_max_rss": "110064", "process_in_blocks": "16", "process_out_blocks": "8", "command_success": false}
+[0m16:38:29.496401 [debug] [MainThread]: Command `dbt debug` failed at 16:38:29.496191 after 0.37 seconds
+[0m16:38:29.497103 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7bdfcc028990>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7bdfcbe7b890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7bdfcf095410>]}
+[0m16:38:29.497850 [debug] [MainThread]: Flushing usage events
