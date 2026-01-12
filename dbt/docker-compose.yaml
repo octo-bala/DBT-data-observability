@@ -1,0 +1,56 @@
+version: '3.8'
+
+x-common-variables: &common-variables
+  MSSQL_SA_PASSWORD: Password123
+  MSSQL_PID: Developer
+
+services:
+  mssql:
+    profiles:
+      - tests
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    ports:
+      - 0.0.0.0:1437:1433
+    environment:
+      <<: *common-variables
+      ACCEPT_EULA: Y
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -b -o /dev/null
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 3s
+    networks:
+      - docker_network
+
+  mssql-configurator:
+    profiles:
+      - tests
+    build:
+      context: tests/dockers/mssql
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment: *common-variables
+    depends_on:
+      mssql:
+        condition: service_healthy
+    command: |
+      bash -c '
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d master -q "alter login sa with DEFAULT_LANGUAGE = french; create DATABASE sql_primedata COLLATE Latin1_General_BIN;";
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d master -q "alter login sa with DEFAULT_LANGUAGE = french; create DATABASE sql_coredata COLLATE Latin1_General_BIN;";
+      echo "DB CREATED!";
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/database_sqlprimedata.sql;
+      echo "struct created";
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/database_sqlprimedata_sampledata.sql;
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_coredata -i /opt/database_sql_coredata.sql;
+      echo "struct created";
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_coredata -i /opt/database_sql_coredata_sampledata.sql;
+      echo "All done!";
+      '
+    networks:
+      - docker_network
+
+networks:
+  docker_network:
+    driver: bridge
