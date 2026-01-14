@@ -1,4 +1,3 @@
-version: '3.8'
 
 x-common-variables: &common-variables
   MSSQL_SA_PASSWORD: Password123
@@ -24,7 +23,7 @@ services:
     networks:
       - docker_network
 
-  mssql-configurator:
+  mssql.configurator:
     profiles:
       - tests
     build:
@@ -37,15 +36,12 @@ services:
         condition: service_healthy
     command: |
       bash -c '
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d master -q "alter login sa with DEFAULT_LANGUAGE = french; create DATABASE sql_primedata COLLATE Latin1_General_BIN;";
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d master -q "alter login sa with DEFAULT_LANGUAGE = french; create DATABASE sql_coredata COLLATE Latin1_General_BIN;";
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d master -q "alter login sa with DEFAULT_LANGUAGE = french; create DATABASE sql_database COLLATE Latin1_General_BIN;";
+      echo "DB sql_database CREATED!";
       echo "DB CREATED!";
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/database_sqlprimedata.sql;
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/tables.sql;
       echo "struct created";
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/database_sqlprimedata_sampledata.sql;
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_coredata -i /opt/database_sql_coredata.sql;
-      echo "struct created";
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_coredata -i /opt/database_sql_coredata_sampledata.sql;
+      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/data.sql;
       echo "All done!";
       '
     networks:
