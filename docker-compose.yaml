@@ -27,7 +27,7 @@ services:
     profiles:
       - tests
     build:
-      context: tests/dockers/mssql
+      context: tests/docker/
     image: mcr.microsoft.com/mssql/server:2022-latest
     platform: linux/amd64
     environment: *common-variables
@@ -39,10 +39,6 @@ services:
       /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d master -q "alter login sa with DEFAULT_LANGUAGE = french; create DATABASE sql_database COLLATE Latin1_General_BIN;";
       echo "DB sql_database CREATED!";
       echo "DB CREATED!";
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/tables.sql;
-      echo "struct created";
-      /opt/mssql-tools18/bin/sqlcmd -S mssql -C -U sa -P "$$MSSQL_SA_PASSWORD" -d sql_primedata -i /opt/data.sql;
-      echo "All done!";
       '
     networks:
       - docker_network
