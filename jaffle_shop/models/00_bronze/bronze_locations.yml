@@ -39,5 +39,5 @@ unit_tests:
             location_id: 2,
             location_name: "San Andreas",
             tax_rate: 0.1,
-            opened_date: "2079-10-27",
+            opened_date: "2079-10-28",
           }

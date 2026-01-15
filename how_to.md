@@ -2,7 +2,7 @@
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r jaffle_shop/requirements.txt
 
 ## wsl Launch database with the docker-compose.yaml
   docker compose build mssql.configurator

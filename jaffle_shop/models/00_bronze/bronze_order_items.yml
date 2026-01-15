@@ -12,5 +12,5 @@ models:
         data_tests:
           - not_null
           - relationships:
-              to: ref('stg_orders')
+              to: ref('bronze_orders')
               field: order_id
