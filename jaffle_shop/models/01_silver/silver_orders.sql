@@ -2,13 +2,13 @@ with
 
 orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select * from {{ ref('bronze_orders') }}
 
 ),
 
 order_items as (
 
-    select * from {{ ref('order_items') }}
+    select * from {{ ref('silver_order_items') }}
 
 ),
 

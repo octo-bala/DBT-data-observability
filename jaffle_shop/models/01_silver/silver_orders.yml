@@ -1,5 +1,5 @@
 models:
-  - name: orders
+  - name: silver_orders
     description: Order overview data mart, offering key details for each order inlcluding if it's a customer's first order and a food vs. drink item breakdown. One row per order.
     data_tests:
       - dbt_utils.expression_is_true:
@@ -16,7 +16,7 @@ models:
         description: The foreign key relating to the customer who placed the order.
         data_tests:
           - relationships:
-              to: ref('stg_customers')
+              to: ref('bronze_customers')
               field: customer_id
       - name: order_total
         description: The total amount of the order in USD including tax.
@@ -32,9 +32,9 @@ models:
 unit_tests:
   - name: test_order_items_compute_to_bools_correctly
     description: "Test that the counts of drinks and food orders convert to booleans properly."
-    model: orders
+    model: silver_orders
     given:
-      - input: ref('order_items')
+      - input: ref('silver_order_items')
         rows:
           - {
               order_id: 1,
@@ -54,7 +54,7 @@ unit_tests:
               is_drink_item: false,
               is_food_item: true,
             }
-      - input: ref('stg_orders')
+      - input: ref('bronze_orders')
         rows:
           - { order_id: 1 }
           - { order_id: 2 }
@@ -81,7 +81,7 @@ semantic_models:
       agg_time_dimension: ordered_at
     description: |
       Order fact table. This table is at the order grain with one row per order.
-    model: ref('orders')
+    model: ref('silver_orders')
     entities:
       - name: order_id
         type: primary

@@ -2,26 +2,26 @@ with
 
 order_items as (
 
-    select * from {{ ref('stg_order_items') }}
+    select * from {{ ref('bronze_order_items') }}
 
 ),
 
 
 orders as (
 
-    select * from {{ ref('stg_orders') }}
+    select * from {{ ref('bronze_orders') }}
 
 ),
 
 products as (
 
-    select * from {{ ref('stg_products') }}
+    select * from {{ ref('bronze_products') }}
 
 ),
 
 supplies as (
 
-    select * from {{ ref('stg_supplies') }}
+    select * from {{ ref('bronze_supplies') }}
 
 ),
 

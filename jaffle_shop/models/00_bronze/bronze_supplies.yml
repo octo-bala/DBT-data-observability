@@ -1,5 +1,5 @@
 models:
-  - name: stg_supplies
+  - name: bronze_supplies
     description: >
       List of our supply expenses data with basic cleaning and transformation applied.
 

@@ -10,11 +10,9 @@ source as (
 
 ),
 
-renamed as (
+order_item as (
 
     select
-
-        ----------  ids
         order_item_id,
         order_id,
         product_id 
@@ -23,4 +21,4 @@ renamed as (
 
 )
 
-select * from renamed
+select * from order_item

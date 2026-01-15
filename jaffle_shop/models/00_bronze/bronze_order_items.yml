@@ -1,5 +1,5 @@
 models:
-  - name: stg_order_items
+  - name: bronze_order_items
     description: Individual food and drink items that make up our orders, one row per item.
     columns:
       - name: order_item_id

@@ -1,5 +1,5 @@
 models:
-  - name: customers
+  - name: gold_customers
     description: Customer overview data mart, offering key details for each unique customer. One row per customer.
     data_tests:
       - dbt_utils.expression_is_true:
@@ -31,12 +31,12 @@ models:
               values: ["new", "returning"]
 
 semantic_models:
-  - name: customers
+  - name: gold_customers
     defaults:
       agg_time_dimension: first_ordered_at
     description: |
       Customer grain mart.
-    model: ref('customers')
+    model: ref('gold_customers')
     entities:
       - name: customer
         expr: customer_id

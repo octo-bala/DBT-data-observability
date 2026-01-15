@@ -1,5 +1,5 @@
 models:
-  - name: stg_customers
+  - name: bronze_customers
     description: Customer data with basic cleaning and transformation applied, one row per customer.
     columns:
       - name: customer_id
