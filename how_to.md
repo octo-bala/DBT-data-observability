@@ -13,3 +13,10 @@ pip install -r requirements.txt
   docker-compose build mssql.configurator
   docker-compose up -d mssql mssql.configurator --force-recreate
 
+# Load data
+
+```
+dbt seed
+```
+
+It will load 6 tables of data
