@@ -1,14 +1,14 @@
-sqlserver_local_profile:
+jaffle_shop:
   outputs:
     data:
       type: sqlserver
-      server: localhost
-      database: sql_coredata
+      server: "127.0.0.1"
+      database: sql_database
       schema: dbo
       user: sa
-      password: 'YourStrong@Passw0rd'
+      password: 'Password123'
       port: 1437
       driver: "ODBC Driver 18 for SQL Server"
       trust_cert: true
-      threads: 16
+      threads: 1
   target: data
