@@ -1,0 +1,141 @@
+version: 2
+
+models:
+  - name: l01_histo_anomalies
+    description: "Modèle qui détecte les sessions d'anomalies et identifie les réapparitions comme nouvelles sessions"
+    data_tests:
+      - unittest_sqlserver.unit_test:
+          name: test_anomalie_disparait_et_revient
+          description: "Test qu'une anomalie qui disparait puis revient est considérée comme une nouvelle session"
+          input_mapping:
+            source('sources_common_audit','HISTO_FAILURES_TABLE'): 
+              (VALUES 
+                (1, 100, 'ESA|0089|_A|2024-01', 'valeur_erreur_A'),
+                (2, 101, 'ESA|0089|_A|2024-01', 'valeur_erreur_A'),
+                (3, 102, 'EURO|7654_B|2024-03', 'valeur_erreur_B'),
+                (4, 103, 'EURO|7654_B|2024-03', 'valeur_erreur_B'),
+                (5, 104, 'ESA|0089|_A|2024-03', 'valeur_erreur_A'),
+                (6, 105, 'EURO|7654_B|2024-03', 'valeur_erreur_B')
+              ) AS v0 (id_anomaly, id_run, id_context, anomaly_column_value)          
+            
+            source('sources_common_audit','MONITOR_TABLE'): 
+              (VALUES 
+                (100, 1, CAST('2024-01-01' AS DATETIME), 'model.project.table', 'col1', 'col1_test_unique', 'table', 'tag1', 'error'),
+                (101, 1, CAST('2024-01-02' AS DATETIME), 'model.project.table', 'col1', 'col1_test_unique', 'table', 'tag1', 'error'),
+                (102, 1, CAST('2024-01-02' AS DATETIME), 'model.project.table', 'col2', 'col2_test_unique', 'table', 'tag1', 'error'),
+                (103, 1, CAST('2024-01-03' AS DATETIME), 'model.project.table', 'col2', 'col2_test_unique', 'table', 'tag1', 'error'),
+                (104, 1, CAST('2024-01-05' AS DATETIME), 'model.project.table', 'col1', 'col1_test_unique', 'table', 'tag1', 'error'),
+                (105, 1, CAST('2024-01-05' AS DATETIME), 'model.project.table', 'col2', 'col2_test_unique', 'table', 'tag1', 'error')
+              ) AS v1 (id_run, num_rows, dat_execution, nam_model_path, nam_column, nam_test, nam_model, nam_tags, nam_severity)
+                      
+          expected_output: 
+            (VALUES 
+              (1, 100, 'ESA|0089|_A|2024-01', 'valeur_erreur_A', CAST('2024-01-01' AS DATETIME), 'col1_test_unique', 1, 1, 0, 1, 3),
+              (2, 101, 'ESA|0089|_A|2024-01', 'valeur_erreur_A', CAST('2024-01-02' AS DATETIME), 'col1_test_unique', 2, 2, 0, 1, 3),
+              (3, 102, 'EURO|7654_B|2024-03', 'valeur_erreur_B', CAST('2024-01-02' AS DATETIME), 'col2_test_unique', 1, 1, 0, 1, 4),
+              (4, 103, 'EURO|7654_B|2024-03', 'valeur_erreur_B', CAST('2024-01-03' AS DATETIME), 'col2_test_unique', 2, 2, 0, 1, 4),
+              (5, 104, 'ESA|0089|_A|2024-03', 'valeur_erreur_A', CAST('2024-01-05' AS DATETIME), 'col1_test_unique', 3, 1, 2, 3, 4),
+              (6, 105, 'EURO|7654_B|2024-03', 'valeur_erreur_B', CAST('2024-01-05' AS DATETIME), 'col2_test_unique', 3, 3, 0, 1, 4)
+            ) AS v2 (id_anomaly, id_run, id_context, anomaly_column_value, dat_execution, nam_test, rank_monitor, rank_histo, session_id, min_rn_monitor, max_rn_monitor)
+
+      - unittest_sqlserver.unit_test:
+          name: test_anomalie_persistente
+          description: "Test qu'une anomalie persistente sur plusieurs exécutions est regroupée dans une seule session"
+          input_mapping:
+            source('sources_common_audit','HISTO_FAILURES_TABLE'): 
+              (VALUES 
+                (10, 200, 'PERS|0001|_X|2025-01', 'val_pers'),
+                (11, 201, 'PERS|0001|_X|2025-01', 'val_pers'),
+                (12, 202, 'PERS|0001|_X|2025-01', 'val_pers')
+              ) AS v3 (id_anomaly, id_run, id_context, anomaly_column_value)
+            source('sources_common_audit','MONITOR_TABLE'):
+              (VALUES 
+                (200, 1, CAST('2025-01-01' AS DATETIME), 'model.project.table', 'col_pers', 'col_pers_unique_test', 'table', 'tag', 'error'),
+                (201, 1, CAST('2025-01-02' AS DATETIME), 'model.project.table', 'col_pers', 'col_pers_unique_test', 'table', 'tag', 'error'),
+                (202, 1, CAST('2025-01-03' AS DATETIME), 'model.project.table', 'col_pers', 'col_pers_unique_test', 'table', 'tag', 'error')
+              ) AS v4 (id_run, num_rows, dat_execution, nam_model_path, nam_column, nam_test, nam_model, nam_tags, nam_severity)
+          expected_output:
+            (VALUES
+              (10, 200, 'PERS|0001|_X|2025-01', 'val_pers', CAST('2025-01-01' AS DATETIME), 'col_pers_unique_test', 1, 1, 0, 1, 4),
+              (11, 201, 'PERS|0001|_X|2025-01', 'val_pers', CAST('2025-01-02' AS DATETIME), 'col_pers_unique_test', 2, 2, 0, 1, 4),
+              (12, 202, 'PERS|0001|_X|2025-01', 'val_pers', CAST('2025-01-03' AS DATETIME), 'col_pers_unique_test', 3, 3, 0, 1, 4)
+            ) AS v5 (id_anomaly, id_run, id_context, anomaly_column_value, dat_execution, nam_test, rank_monitor, rank_histo, session_id, min_rn_monitor, max_rn_monitor)
+
+      - unittest_sqlserver.unit_test:
+          name: test_anomalie_multiple_apparitions
+          description: "Test qu'une anomalie qui apparait, disparait puis revient plusieurs fois crée plusieurs sessions"
+          input_mapping:
+            source('sources_common_audit','HISTO_FAILURES_TABLE'): 
+              (VALUES 
+                (20, 300, 'FLAP|1000|_Y|2025-02', 'val_flap'),
+                (21, 301, 'FLAP|1000|_Y|2025-02', 'val_flap'),
+                (22, 303, 'FLAP|1000|_Y|2025-02', 'val_flap'),
+                (23, 305, 'FLAP|1000|_Y|2025-02', 'val_flap')
+              ) AS v6 (id_anomaly, id_run, id_context, anomaly_column_value)
+            source('sources_common_audit','MONITOR_TABLE'):
+              (VALUES 
+                (300, 1, CAST('2025-02-01' AS DATETIME), 'model.project.table', 'col_flap', 'flap_test_unique', 'table', 'tag', 'error'),
+                (301, 1, CAST('2025-02-02' AS DATETIME), 'model.project.table', 'col_flap', 'flap_test_unique', 'table', 'tag', 'error'),
+                (302, 0, CAST('2025-02-03' AS DATETIME), 'model.project.table', 'col_flap', 'flap_test_unique', 'table', 'tag', 'error'),
+                (303, 1, CAST('2025-02-04' AS DATETIME), 'model.project.table', 'col_flap', 'flap_test_unique', 'table', 'tag', 'error'),
+                (304, 0, CAST('2025-02-05' AS DATETIME), 'model.project.table', 'col_flap', 'flap_test_unique', 'table', 'tag', 'error'),
+                (305, 1, CAST('2025-02-06' AS DATETIME), 'model.project.table', 'col_flap', 'flap_test_unique', 'table', 'tag', 'error')
+              ) AS v7 (id_run, num_rows, dat_execution, nam_model_path, nam_column, nam_test, nam_model, nam_tags, nam_severity)
+          expected_output:
+            (VALUES
+              (20, 300, 'FLAP|1000|_Y|2025-02', 'val_flap', CAST('2025-02-01' AS DATETIME), 'flap_test_unique', 1, 1, 0, 1, 3),
+              (21, 301, 'FLAP|1000|_Y|2025-02', 'val_flap', CAST('2025-02-02' AS DATETIME), 'flap_test_unique', 2, 2, 0, 1, 3),
+              (22, 303, 'FLAP|1000|_Y|2025-02', 'val_flap', CAST('2025-02-04' AS DATETIME), 'flap_test_unique', 4, 3, 1, 4, 5),
+              (23, 305, 'FLAP|1000|_Y|2025-02', 'val_flap', CAST('2025-02-06' AS DATETIME), 'flap_test_unique', 6, 4, 2, 6, 7)
+            ) AS v8 (id_anomaly, id_run, id_context, anomaly_column_value, dat_execution, nam_test, rank_monitor, rank_histo, session_id, min_rn_monitor, max_rn_monitor)
+
+      - unittest_sqlserver.unit_test:
+          name: test_plusieurs_anomalies_meme_test
+          description: "Test plusieurs anomalies différentes détectées pour le même `nam_test` le même jour et leur regroupement distinct par invariant"
+          input_mapping:
+            source('sources_common_audit','HISTO_FAILURES_TABLE'): 
+              (VALUES 
+                (30, 400, 'MULT|A|_Z|2025-03', 'val_a1'),
+                (31, 400, 'MULT|C|_Z|2025-03', 'val_a2'),
+                (32, 401, 'MULT|B|_Z|2025-03', 'val_b1')
+              ) AS v9 (id_anomaly, id_run, id_context, anomaly_column_value)
+            source('sources_common_audit','MONITOR_TABLE'):
+              (VALUES 
+                (400, 2, CAST('2025-03-01' AS DATETIME), 'model.project.table', 'col_mult', 'col_mult_accepted_values', 'table', 'tag', 'error'),
+                (401, 1, CAST('2025-03-01' AS DATETIME), 'model.project.table', 'col_mult', 'col_mult_unique', 'table', 'tag', 'error')
+              ) AS v10 (id_run, num_rows, dat_execution, nam_model_path, nam_column, nam_test, nam_model, nam_tags, nam_severity)
+          expected_output:
+            (VALUES
+              (30, 400, 'MULT|A|_Z|2025-03', 'val_a1', CAST('2025-03-01' AS DATETIME), 'col_mult_accepted_values', 1, 1, 0, 1, 2),
+              (31, 400, 'MULT|C|_Z|2025-03', 'val_a2', CAST('2025-03-01' AS DATETIME), 'col_mult_accepted_values', 1, 1, 0, 1, 2),
+              (32, 401, 'MULT|B|_Z|2025-03', 'val_b1', CAST('2025-03-01' AS DATETIME), 'col_mult_unique', 1, 1, 0, 1, 2)
+            ) AS v11 (id_anomaly, id_run, id_context, anomaly_column_value, dat_execution, nam_test, rank_monitor, rank_histo, session_id, min_rn_monitor, max_rn_monitor)
+      
+      - unittest_sqlserver.unit_test:
+          name: test_plusieurs_anomalies_meme_test2
+          description: "Test plusieurs anomalies différentes détectées pour le même `nam_test` le même jour et leur regroupement distinct par invariant"
+          input_mapping:
+            source('sources_common_audit','HISTO_FAILURES_TABLE'): 
+              (VALUES 
+                (30, 400, 'MULT|A|_Z|2025-03', 'val_a1'),
+                (31, 400, 'MULT|C|_Z|2025-03', 'val_a2'),
+                (32, 401, 'MULT|B|_Z|2025-03', 'val_b1'),
+                (33, 402, 'MULT|D|_Z|2025-03', 'NULL'),
+                (34, 402, 'MULT|E|_Z|2025-03', 'NULL'),
+                (35, 402, 'MULT|F|_Z|2025-03', 'NULL')
+              ) AS v12 (id_anomaly, id_run, id_context, anomaly_column_value)
+            source('sources_common_audit','MONITOR_TABLE'):
+              (VALUES 
+                (400, 2, CAST('2025-03-01' AS DATETIME), 'model.project.table', 'col_mult', 'col_mult_accepted_values', 'table', 'tag', 'error'),
+                (401, 1, CAST('2025-03-01' AS DATETIME), 'model.project.table', 'col_mult', 'col_mult_unique', 'table', 'tag', 'error'),
+                (402, 3, CAST('2025-03-01' AS DATETIME), 'model.project.table', 'col2', 'col2_not_null', 'table', 'tag', 'error')
+              ) AS v13 (id_run, num_rows, dat_execution, nam_model_path, nam_column, nam_test, nam_model, nam_tags, nam_severity)
+          expected_output:
+            (VALUES
+              (30, 400, 'MULT|A|_Z|2025-03', 'val_a1', CAST('2025-03-01' AS DATETIME), 'col_mult_accepted_values', 1, 1, 0, 1, 2),
+              (31, 400, 'MULT|C|_Z|2025-03', 'val_a2', CAST('2025-03-01' AS DATETIME), 'col_mult_accepted_values', 1, 1, 0, 1, 2),
+              (32, 401, 'MULT|B|_Z|2025-03', 'val_b1', CAST('2025-03-01' AS DATETIME), 'col_mult_unique', 1, 1, 0, 1, 2),
+              (33, 402, 'MULT|D|_Z|2025-03', 'NULL', CAST('2025-03-01' AS DATETIME), 'col2_not_null', 1, 1, 0, 1, 2),
+              (34, 402, 'MULT|E|_Z|2025-03', 'NULL', CAST('2025-03-01' AS DATETIME), 'col2_not_null', 1, 1, 0, 1, 2),
+              (35, 402, 'MULT|F|_Z|2025-03', 'NULL', CAST('2025-03-01' AS DATETIME), 'col2_not_null', 1, 1, 0, 1, 2)
+            ) AS v14 (id_anomaly, id_run, id_context, anomaly_column_value, dat_execution, nam_test, rank_monitor, rank_histo, session_id, min_rn_monitor, max_rn_monitor)

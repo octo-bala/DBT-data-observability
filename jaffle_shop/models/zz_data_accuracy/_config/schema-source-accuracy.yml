@@ -1,0 +1,10 @@
+version: 3
+
+sources:
+  - name: sources_common_audit
+    database: sql_coredata
+    schema: "{{ env_var('MSSQL_DBT_SCHEMA') }}_dbt_test__audit"
+    description: ""
+    tables:
+      - name: HISTO_FAILURES_TABLE
+      - name: MONITOR_TABLE

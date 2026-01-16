@@ -27,3 +27,9 @@ dbt seed
 
 
 It will load 6 tables of data
+
+### Using the starter project
+
+Try running the following commands:
+- dbt run
+- dbt test
