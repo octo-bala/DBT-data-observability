@@ -110,43 +110,54 @@
     {% endif %}
 
 {# 4. Build the list of columns for concatenation #}
+{% set concat_expr = [] %}
+{% if meta.id and meta.id | length > 0 %}
+  {% for col_name in meta.id %}
+    {% do concat_expr.append("COALESCE(CAST(" ~ col_name ~ " AS VARCHAR(256)), 'NULL')") %}
+  {% endfor %}
+{% else %}
+  {% set columns_info_query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+                               WHERE TABLE_SCHEMA = '" ~ base_schema[0] ~ "' 
+                                 AND TABLE_NAME = '" ~ nom_table ~ "' 
+                               ORDER BY ORDINAL_POSITION" %}
+  {% set columns_result = run_query(columns_info_query) %}
+  {% for col in columns_result.rows %}
+    {% do concat_expr.append("COALESCE(CAST(" ~ col[0] ~ " AS VARCHAR(256)), 'NULL')") %}
+  {% endfor %}
+{% endif %}
 
-    {% set concat_expr = [] %}
-    {% if meta.id and meta.id | length > 0 %}
-        {% for col_name in meta.id %}
-            
-        {% do concat_expr.append("COALESCE(CAST(" + col_name + " AS VARCHAR), 'NULL')") %}
-        {% endfor %}
-    {% else %}
-            {% set columns_info_query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-                                WHERE TABLE_SCHEMA = '" + base_schema[0] + "' 
-                                AND TABLE_NAME = '" + nom_table + "' 
-                                ORDER BY ORDINAL_POSITION" %}
-        {% set columns_result = run_query(columns_info_query) %}
-        {% for col in columns_result.rows %}
-        {% do concat_expr.append("COALESCE(CAST(" + col[0] + " AS VARCHAR), 'NULL')") %}
-    {% endfor %}
-    {% endif %}
-{# {{ log(concat_expr, info=True) }} #}
+{% if concat_expr | length == 0 %}
+    {% set id_context_expr = "NULL" %}
+{% elif concat_expr | length == 1 %}
+    {% set id_context_expr = concat_expr[0] %}
+{% else %}
+    {% set id_context_expr = "CONCAT_WS('|', " ~ (concat_expr | join(', ')) ~ ")" %}
+{% endif %}
+
+{# {{ log(id_context_expr, info=True) }} #}
 
 {# 5. Insert into HISTO_FAILURES_TABLE #}
-        {% set bulk_insert = "
-        WITH failed_values AS (
-            SELECT DISTINCT " + nam_column + " as error_value
-            FROM " + database + "." + schema + "." + identifier + "
-        )
-        INSERT INTO " + database + "." + schema + ".HISTO_FAILURES_TABLE 
-        (id_run, id_context, anomaly_column_value)
-        SELECT 
-            '" + id_run_monitor|string + "',
-            CONCAT_WS('|', " + (concat_expr | join(', ')) + "),
-            COALESCE(CAST(t." + tested_column + " AS VARCHAR(64)), 'NULL')
-        FROM " + database + "." + base_schema[0] + "." + nom_table + " t
-        INNER JOIN failed_values fv 
-            ON (t." + tested_column + " = fv.error_value 
-                OR (t." + tested_column + " IS NULL AND fv.error_value IS NULL))
-        " + ("WHERE " + test_condition if test_condition != 'NotGiven' else "") + "
-        " %}
+{% set bulk_insert %}
+    WITH failed_values AS (
+        SELECT DISTINCT {{ nam_column }} AS error_value
+        FROM {{ database }}.{{ schema }}.{{ identifier }}
+    )
+    INSERT INTO {{ database }}.{{ schema }}.HISTO_FAILURES_TABLE 
+    (id_run, id_context, anomaly_column_value)
+    SELECT 
+    '{{ id_run_monitor|string }}',
+    {{ id_context_expr }},
+    COALESCE(CAST(t.{{ tested_column }} AS VARCHAR(64)), 'NULL')
+    FROM {{ database }}.{{ base_schema[0] }}.{{ nom_table }} t
+    INNER JOIN failed_values fv 
+    ON (t.{{ tested_column }} = fv.error_value 
+        OR (t.{{ tested_column }} IS NULL AND fv.error_value IS NULL))
+    {% if test_condition != 'NotGiven' %}
+        WHERE {{ test_condition }}
+    {% endif %}
+{% endset %}
 
-        {% do run_query(bulk_insert) %}
+
+{% do run_query(bulk_insert) %}
+
 {% endmacro %}
