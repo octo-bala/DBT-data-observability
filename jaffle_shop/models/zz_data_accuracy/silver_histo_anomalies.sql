@@ -1,7 +1,7 @@
 {{ config(materialized='view', tags=["quality"]) }}
 
 with 
-    histo_anomalies as (select * from {{ ref('l01_histo_anomalies')}})
+    histo_anomalies as (select * from {{ ref('bronze_histo_anomalies')}})
     ,monitor as (select *
                         ,ROW_NUMBER() OVER (PARTITION BY nam_test ORDER BY dat_execution asc) as rank_monitor
                  from {{ source('sources_common_audit','MONITOR_TABLE')}})

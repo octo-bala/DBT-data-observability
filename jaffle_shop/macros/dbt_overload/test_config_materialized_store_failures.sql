@@ -19,7 +19,7 @@
     {% endif %}
 
     {% set target_relation = api.Relation.create(
-        identifier=identifier, schema=schema, database=database, type=store_failures_as) -%} %}
+        identifier=identifier, schema=schema, database=database, type=store_failures_as) -%}
 
     {% if old_relation %}
         {% do adapter.drop_relation(old_relation) %}

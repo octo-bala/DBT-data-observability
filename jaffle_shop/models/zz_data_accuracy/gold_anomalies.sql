@@ -2,7 +2,7 @@
 
 WITH histo_anomalies AS (
     SELECT *
-    FROM {{ ref('l02_histo_anomalies') }}
+    FROM {{ ref('silver_histo_anomalies') }}
 )
 
 SELECT
