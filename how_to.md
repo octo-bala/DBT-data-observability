@@ -16,6 +16,7 @@ pip install -r jaffle_shop/requirements.txt
 # Load data
 
 ```
+dbt deps
 dbt seed
 ```
 
