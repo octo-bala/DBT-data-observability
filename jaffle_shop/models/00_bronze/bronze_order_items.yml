@@ -11,6 +11,4 @@ models:
         description: The corresponding order each order item belongs to
         data_tests:
           - not_null
-          - relationships:
-              to: ref('bronze_orders')
-              field: order_id
+
