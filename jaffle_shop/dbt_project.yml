@@ -6,7 +6,7 @@ name: 'jaffle_shop'
 version: '1.0.0'
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'jaffle_shop_demo_1'
+profile: 'jaffle_shop_demo_2'
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
