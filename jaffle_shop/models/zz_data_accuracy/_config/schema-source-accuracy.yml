@@ -2,7 +2,7 @@ version: 3
 
 sources:
   - name: sources_common_audit
-    database: sql_database
+    database: sql_database_demo2
     schema: "dbo_dbt_test__audit"
     description: ""
     tables:
