@@ -1,0 +1,27 @@
+Running with dbt=1.11.6
+Registered adapter: sqlserver=1.9.0
+[[33mWARNING[0m]: Time spines without YAML configuration are in the process of
+deprecation. Please add YAML configuration for your 'metricflow_time_spine'
+model. See documentation on MetricFlow time spines:
+https://docs.getdbt.com/docs/build/metricflow-time-spine and behavior change
+documentation:
+https://docs.getdbt.com/reference/global-configs/behavior-changes.
+[[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- models.jaffle_shop.example
+Found 16 models, 22 data tests, 6 seeds, 8 sources, 19 metrics, 665 macros, 6 semantic models, 3 saved queries, 2 unit tests
+
+Concurrency: 1 threads (target='data')
+
+
+Finished running  in 0 hours 2 minutes and 6.15 seconds (126.15s).
+Encountered an error:
+Database Error
+  ('HYT00', '[HYT00] [Microsoft][ODBC Driver 18 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+[[33mWARNING[0m][DeprecationsSummary]: Deprecated functionality
+Summary of encountered deprecations:
+- MFTimespineWithoutYamlConfigurationDeprecation: 1 occurrence
+To see all deprecation instances instead of just the first occurrence of each,
+run command again with the `--show-all-deprecations` flag. You may also need to
+run with `--no-partial-parse` as some deprecations are only encountered during
+parsing.

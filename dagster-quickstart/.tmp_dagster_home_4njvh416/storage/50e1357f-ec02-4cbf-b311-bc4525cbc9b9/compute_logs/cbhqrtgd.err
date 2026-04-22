@@ -1,0 +1,31 @@
+[32m2026-02-20 14:58:21 +0100[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 50e1357f-ec02-4cbf-b311-bc4525cbc9b9 - 791751 - LOGS_CAPTURED - Started capturing logs in process (pid: 791751).
+[32m2026-02-20 14:58:21 +0100[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 50e1357f-ec02-4cbf-b311-bc4525cbc9b9 - 791751 - lire_donnees - STEP_START - Started execution of step "lire_donnees".
+[32m2026-02-20 14:58:21 +0100[0m - dagster - [34mINFO[0m - __ASSET_JOB - 50e1357f-ec02-4cbf-b311-bc4525cbc9b9 - lire_donnees - {'host': 'localhost', 'port': 1433, 'database': 'sql_database_demo2', 'username': 'sa', 'password': 'Password123', 'driver': 'ODBC Driver 18 for SQL Server', '_state__internal__': ConfigurableResourceFactoryState(nested_partial_resources={}, resolved_config_dict={'host': 'localhost', 'database': 'sql_database_demo2', 'username': 'sa', 'password': 'Password123'}, config_schema=<dagster._core.definitions.definition_config_schema.DefinitionConfigSchema object at 0x72d60e177860>, schema=Field(<dagster._config.field_utils.Shape object at 0x72d615ac4230>, default=@, is_required=True), nested_resources={}, resource_context=<dagster._core.execution.context.init.InitResourceContext object at 0x72d60e176c00>)}
+[32m2026-02-20 14:58:36 +0100[0m - dagster - [34mERROR[0m - [31m__ASSET_JOB - 50e1357f-ec02-4cbf-b311-bc4525cbc9b9 - 791751 - lire_donnees - STEP_FAILURE - Execution of step "lire_donnees" failed.
+
+dagster._core.errors.DagsterExecutionStepExecutionError: Error occurred while executing op "lire_donnees"::
+
+pyodbc.OperationalError: ('HYT00', '[HYT00] [Microsoft][ODBC Driver 18 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+
+Stack Trace:
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/utils.py", line 57, in op_execution_error_boundary
+    yield
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_utils/__init__.py", line 394, in iterate_with_context
+    next_output = next(iterator)
+                  ^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/compute_generator.py", line 135, in _coerce_op_compute_fn_to_iterator
+    result = invoke_compute_fn(
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/compute_generator.py", line 115, in invoke_compute_fn
+    return fn(context, **args_to_pass) if context_arg_provided else fn(**args_to_pass)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/src/dagster_quickstart/defs/assets.py", line 10, in lire_donnees
+    rows = mssql.execute_query("SELECT * FROM bronze_orders")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/src/dagster_quickstart/defs/resources.py", line 34, in execute_query
+    with self.get_connection() as conn:
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/src/dagster_quickstart/defs/resources.py", line 31, in get_connection
+    return pyodbc.connect(conn_str)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+[0m

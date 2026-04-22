@@ -8,6 +8,12 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+### Install uv
+```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+
 ## wsl Launch database with the docker-compose.yaml
   docker compose build mssql.configurator
   docker compose up -d mssql mssql.configurator --force-recreate

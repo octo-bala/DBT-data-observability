@@ -1,0 +1,48 @@
+[32m2026-04-22 18:06:57 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - 37639 - LOGS_CAPTURED - Started capturing logs in process (pid: 37639).
+[32m2026-04-22 18:06:57 +0200[0m - dagster - [34mDEBUG[0m - __ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - 37639 - dbt_models - STEP_START - Started execution of step "dbt_models".
+[32m2026-04-22 18:06:57 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - dbt_models - A dbt subsetted execution is not being performed. Using the default dbt selection arguments `['--select', 'fqn:*']`.
+[32m2026-04-22 18:07:00 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - dbt_models - Copying `/home/btharsana/Hands_on_Dagster/DBT-data-observability/jaffle_shop/target/partial_parse.msgpack` to `/home/btharsana/Hands_on_Dagster/DBT-data-observability/jaffle_shop/target/dbt_models-59c18f7-451cb61/partial_parse.msgpack` to take advantage of partial parsing.
+[32m2026-04-22 18:07:00 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - dbt_models - Running dbt command: `dbt build --select fqn:*`.
+[32m2026-04-22 18:09:09 +0200[0m - dagster - [34mINFO[0m - __ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - dbt_models - Finished dbt command: `dbt build --select fqn:*`.
+[32m2026-04-22 18:09:09 +0200[0m - dagster - [34mERROR[0m - [31m__ASSET_JOB - 59c18f72-0f62-49af-b6ec-79c5edb02fe0 - 37639 - dbt_models - STEP_FAILURE - Execution of step "dbt_models" failed.
+
+dagster_dbt.errors.DagsterDbtCliRuntimeError: The dbt CLI process with command
+
+`dbt build --select fqn:*`
+
+failed with exit code `2`. Check the stdout in the Dagster compute logs for the full information about the error, or view the dbt debug log: /home/btharsana/Hands_on_Dagster/DBT-data-observability/jaffle_shop/target/dbt_models-59c18f7-451cb61/dbt.log.
+
+Errors parsed from dbt logs:
+
+Encountered an error:
+Database Error
+  ('HYT00', '[HYT00] [Microsoft][ODBC Driver 18 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+
+Stack Trace:
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/execute_plan.py", line 247, in dagster_event_sequence_for_step
+    yield from check.generator(step_events)
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/execute_step.py", line 505, in core_dagster_event_sequence_for_step
+    for user_event in _step_output_error_checked_user_event_sequence(
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/execute_step.py", line 184, in _step_output_error_checked_user_event_sequence
+    for user_event in user_event_sequence:
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/execute_step.py", line 88, in _process_asset_results_to_events
+    for user_event in user_event_sequence:
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/compute.py", line 188, in execute_core_compute
+    for step_output in _yield_compute_results(step_context, inputs, compute_fn, compute_context):
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_core/execution/plan/compute.py", line 157, in _yield_compute_results
+    for event in iterate_with_context(
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster/_utils/__init__.py", line 394, in iterate_with_context
+    next_output = next(iterator)
+                  ^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/src/dagster_quickstart/defs/assets.py", line 10, in dbt_models
+    yield from dbt.cli(["build"], context=context).stream()
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster_dbt/core/dbt_event_iterator.py", line 215, in __next__
+    return next(self._inner_iterator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster_dbt/core/dbt_cli_invocation.py", line 288, in _stream_asset_events
+    for event in self.stream_raw_events():
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster_dbt/core/dbt_cli_invocation.py", line 381, in stream_raw_events
+    self._raise_on_error()
+  File "/home/btharsana/Hands_on_Dagster/DBT-data-observability/dagster-quickstart/.venv/lib/python3.12/site-packages/dagster_dbt/core/dbt_cli_invocation.py", line 474, in _raise_on_error
+    raise error
+[0m
